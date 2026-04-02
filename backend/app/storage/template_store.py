@@ -94,6 +94,11 @@ class TemplateStore:
         return pdf_path
 
     def get_template_dir(self, template_id: str) -> Path:
+        """Return the on-disk directory for *template_id*.
+
+        Raises ``KeyError`` if the template is not in the metadata index.
+        """
+        self.get_template(template_id)
         return self._root / template_id
 
     def _update_meta(
