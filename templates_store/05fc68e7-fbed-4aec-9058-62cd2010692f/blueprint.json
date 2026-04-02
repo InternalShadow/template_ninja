@@ -1,0 +1,298 @@
+{
+  "page_width": 612.0,
+  "page_height": 792.0,
+  "layout_type": "right_sidebar",
+  "background_regions": [
+    {
+      "x0": -26.45725440979004,
+      "y0": -5.676008701324463,
+      "x1": 616.701904296875,
+      "y1": 61.20000457763672,
+      "width": 643.159158706665,
+      "height": 66.87601327896118,
+      "color": [
+        1.0,
+        0.9764999747276306,
+        0.40779998898506165
+      ]
+    },
+    {
+      "x0": -15.61505126953125,
+      "y0": 52.795433044433594,
+      "x1": 621.1138305664062,
+      "y1": 69.58597564697266,
+      "width": 636.7288818359375,
+      "height": 16.790542602539062,
+      "color": [
+        0.6510000228881836,
+        0.6510000228881836,
+        0.6510000228881836
+      ]
+    },
+    {
+      "x0": -0.03387451171875,
+      "y0": 112.58662414550781,
+      "x1": 726.22265625,
+      "y1": 129.37716674804688,
+      "width": 726.2565307617188,
+      "height": 16.790542602539062,
+      "color": [
+        0.6510000228881836,
+        0.6510000228881836,
+        0.6510000228881836
+      ]
+    },
+    {
+      "x0": -20.8968505859375,
+      "y0": 286.12109375,
+      "x1": 705.3596801757812,
+      "y1": 302.91162109375,
+      "width": 726.2565307617188,
+      "height": 16.79052734375,
+      "color": [
+        0.6510000228881836,
+        0.6510000228881836,
+        0.6510000228881836
+      ]
+    },
+    {
+      "x0": -15.600980758666992,
+      "y0": 766.9732666015625,
+      "x1": 627.6798706054688,
+      "y1": 854.8494262695312,
+      "width": 643.2808513641357,
+      "height": 87.87615966796875,
+      "color": [
+        1.0,
+        0.9764999747276306,
+        0.40779998898506165
+      ]
+    }
+  ],
+  "columns": [
+    {
+      "id": "col_0",
+      "x0": 0,
+      "x1": 463.5238342285156,
+      "y_bottom": 0,
+      "y_top": 792
+    },
+    {
+      "id": "col_1",
+      "x0": 463.5238342285156,
+      "x1": 612,
+      "y_bottom": 0,
+      "y_top": 792
+    }
+  ],
+  "element_styles": {
+    "name": {
+      "font": "TrebuchetMS",
+      "size": 25.57,
+      "color": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bold": false,
+      "italic": false,
+      "align": "center",
+      "leading": 34.53,
+      "bg_color": null,
+      "bar_height": 0.0,
+      "spacing_before": 4.0,
+      "spacing_after": 2.0,
+      "bullet_char": "",
+      "col_idx": 0
+    },
+    "subtitle": {
+      "font": "ClearSans",
+      "size": 9.4,
+      "color": [
+        0.45098039215686275,
+        0.45098039215686275,
+        0.45098039215686275
+      ],
+      "bold": false,
+      "italic": false,
+      "align": "center",
+      "leading": 12.7,
+      "bg_color": null,
+      "bar_height": 0.0,
+      "spacing_before": 4.0,
+      "spacing_after": 2.0,
+      "bullet_char": "",
+      "col_idx": 0
+    },
+    "section_heading": {
+      "font": "ClearSans-Medium",
+      "size": 13.2,
+      "color": [
+        0.45098039215686275,
+        0.45098039215686275,
+        0.45098039215686275
+      ],
+      "bold": false,
+      "italic": false,
+      "align": "left",
+      "leading": 17.81,
+      "bg_color": [
+        0.6510000228881836,
+        0.6510000228881836,
+        0.6510000228881836
+      ],
+      "bar_height": 16.790542602539062,
+      "spacing_before": 4.0,
+      "spacing_after": 2.0,
+      "bullet_char": "",
+      "col_idx": 0
+    },
+    "edu_degree": {
+      "font": "ClearSans-Medium",
+      "size": 9.89,
+      "color": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bold": false,
+      "italic": false,
+      "align": "left",
+      "leading": 13.35,
+      "bg_color": null,
+      "bar_height": 0.0,
+      "spacing_before": 4.0,
+      "spacing_after": 2.0,
+      "bullet_char": "",
+      "col_idx": 0
+    },
+    "skill_item": {
+      "font": "ClearSans",
+      "size": 8.42,
+      "color": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bold": false,
+      "italic": false,
+      "align": "left",
+      "leading": 11.37,
+      "bg_color": null,
+      "bar_height": 0.0,
+      "spacing_before": 4.0,
+      "spacing_after": 2.0,
+      "bullet_char": "",
+      "col_idx": 0
+    },
+    "job_company": {
+      "font": "ClearSans-Bold",
+      "size": 8.43,
+      "color": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bold": true,
+      "italic": false,
+      "align": "center",
+      "leading": 11.39,
+      "bg_color": null,
+      "bar_height": 0.0,
+      "spacing_before": 4.0,
+      "spacing_after": 2.0,
+      "bullet_char": "",
+      "col_idx": 0
+    },
+    "job_date": {
+      "font": "ClearSans-Bold",
+      "size": 8.43,
+      "color": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bold": true,
+      "italic": false,
+      "align": "right",
+      "leading": 11.39,
+      "bg_color": null,
+      "bar_height": 0.0,
+      "spacing_before": 4.0,
+      "spacing_after": 2.0,
+      "bullet_char": "",
+      "col_idx": 0
+    },
+    "job_role": {
+      "font": "ClearSans",
+      "size": 8.43,
+      "color": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bold": false,
+      "italic": false,
+      "align": "center",
+      "leading": 11.39,
+      "bg_color": null,
+      "bar_height": 0.0,
+      "spacing_before": 4.0,
+      "spacing_after": 2.0,
+      "bullet_char": "",
+      "col_idx": 0
+    },
+    "body_paragraph": {
+      "font": "ClearSans",
+      "size": 8.43,
+      "color": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bold": false,
+      "italic": false,
+      "align": "center",
+      "leading": 11.39,
+      "bg_color": null,
+      "bar_height": 0.0,
+      "spacing_before": 4.0,
+      "spacing_after": 2.0,
+      "bullet_char": "",
+      "col_idx": 0
+    }
+  },
+  "section_map": {
+    "col_0": [
+      {
+        "heading_text": "",
+        "type": "identity"
+      },
+      {
+        "heading_text": "CONTACT",
+        "type": "contact"
+      },
+      {
+        "heading_text": "EDUCATION",
+        "type": "education"
+      },
+      {
+        "heading_text": "TECHNICAL SKILLS",
+        "type": "skills"
+      },
+      {
+        "heading_text": "EXPERIENCE",
+        "type": "experience"
+      }
+    ],
+    "col_1": []
+  },
+  "name_col_idx": 0,
+  "skill_format": "flat",
+  "job_entry_format": "combined",
+  "job_body_format": "paragraph",
+  "line_spacing": 19.47,
+  "section_spacing": 24.0,
+  "entry_spacing": 14.4,
+  "bullet_indent": 10.0
+}
