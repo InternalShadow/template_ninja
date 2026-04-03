@@ -29,7 +29,8 @@ _EMPTY_PDF = _DATA_DIR / "output" / "resume_!Resume.pdf"
 @pytest.fixture(scope="module")
 def template_blueprint() -> Blueprint:
     """Extract the Jannine Chan template once for all tests in this module."""
-    assert _TEMPLATE_PDF.exists(), f"Template PDF missing: {_TEMPLATE_PDF}"
+    if not _TEMPLATE_PDF.exists():
+        pytest.skip(f"Template PDF missing: {_TEMPLATE_PDF}")
     return extract_blueprint(_TEMPLATE_PDF)
 
 

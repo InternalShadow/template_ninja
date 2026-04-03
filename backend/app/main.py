@@ -5,6 +5,8 @@ import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api import api_router
+from app.api.deps import set_store
 from app.config import get_settings
 from app.storage import TemplateStore
 
@@ -12,14 +14,15 @@ logger = structlog.stdlib.get_logger()
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncIterator[dict]:
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     settings = get_settings()
     settings.templates_dir.mkdir(parents=True, exist_ok=True)
 
     store = TemplateStore(settings.templates_dir)
+    set_store(store)
     logger.info("startup", data_dir=str(settings.data_dir), templates=len(store.list_templates()))
 
-    yield {"store": store}
+    yield
 
     logger.info("shutdown")
 
@@ -38,6 +41,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+app.include_router(api_router)
 
 
 @app.get("/health")
