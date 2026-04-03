@@ -9,7 +9,6 @@ interface TestResult {
   method: string;
   path: string;
   status: number | null;
-  corsOrigin: string | null;
   contentType: string | null;
   bodyPreview: string;
   pass: boolean;
@@ -53,13 +52,12 @@ async function runTest(
   const url = `${API_BASE}${path}`;
   try {
     const resp = await fetch(url, { method, ...options });
-    const corsOrigin = resp.headers.get("access-control-allow-origin");
     const contentType = resp.headers.get("content-type") || "";
 
     let bodyPreview: string;
     if (contentType.includes("json")) {
       const json = await resp.json();
-      bodyPreview = JSON.stringify(json).slice(0, 200);
+      bodyPreview = JSON.stringify(json).slice(0, 300);
     } else if (contentType.includes("image/png")) {
       const blob = await resp.blob();
       bodyPreview = `PNG image (${blob.size} bytes)`;
@@ -67,33 +65,45 @@ async function runTest(
       const blob = await resp.blob();
       bodyPreview = `PDF file (${blob.size} bytes)`;
     } else {
-      bodyPreview = (await resp.text()).slice(0, 200);
+      bodyPreview = (await resp.text()).slice(0, 300);
     }
 
+    // If the browser could read the cross-origin response, CORS is working.
+    // Browsers block the response entirely (throwing a TypeError) when CORS
+    // headers are missing — so reaching this point IS the proof.
     return {
       name,
       method,
       path,
       status: resp.status,
-      corsOrigin,
       contentType,
       bodyPreview,
-      pass: resp.ok && corsOrigin !== null,
-      error: null,
+      pass: resp.ok,
+      error: resp.ok ? null : `HTTP ${resp.status}`,
     };
   } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    const isCors = msg.includes("Failed to fetch") || msg.includes("NetworkError");
     return {
       name,
       method,
       path,
       status: null,
-      corsOrigin: null,
       contentType: null,
       bodyPreview: "",
       pass: false,
-      error: err instanceof Error ? err.message : String(err),
+      error: isCors ? `CORS BLOCKED — ${msg}` : msg,
     };
   }
+}
+
+async function fetchTemplateId(): Promise<string | null> {
+  try {
+    const resp = await fetch(`${API_BASE}/templates`);
+    const data = await resp.json();
+    if (Array.isArray(data) && data.length > 0) return data[0].id;
+  } catch { /* no-op */ }
+  return null;
 }
 
 export default function SmokeTestPage() {
@@ -114,49 +124,10 @@ export default function SmokeTestPage() {
     push(await runTest("Health check", "GET", "/health"));
 
     // 2. GET /templates
-    const listResult = await runTest("List templates", "GET", "/templates");
-    push(listResult);
+    push(await runTest("List templates", "GET", "/templates"));
 
-    let templateId: string | null = null;
-    if (listResult.status === 200) {
-      try {
-        const parsed = JSON.parse(listResult.bodyPreview.length < 200 ? listResult.bodyPreview : "[]");
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          templateId = parsed[0].id;
-        }
-      } catch {
-        // re-fetch to get the actual data
-        const resp = await fetch(`${API_BASE}/templates`);
-        const data = await resp.json();
-        if (data.length > 0) templateId = data[0].id;
-      }
-    }
-
-    if (!templateId) {
-      // Upload a test template using a minimal PDF
-      const minimalPdf = new Uint8Array([
-        0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x30, 0x0a, 0x31, 0x20,
-        0x30, 0x20, 0x6f, 0x62, 0x6a, 0x3c, 0x3c, 0x2f, 0x54, 0x79, 0x70,
-        0x65, 0x2f, 0x43, 0x61, 0x74, 0x61, 0x6c, 0x6f, 0x67, 0x2f, 0x50,
-        0x61, 0x67, 0x65, 0x73, 0x20, 0x32, 0x20, 0x30, 0x20, 0x52, 0x3e,
-        0x3e, 0x65, 0x6e, 0x64, 0x6f, 0x62, 0x6a, 0x0a,
-      ]);
-      const formData = new FormData();
-      formData.append("file", new Blob([minimalPdf], { type: "application/pdf" }), "test.pdf");
-      formData.append("name", "CORS Smoke Test");
-
-      const uploadResult = await runTest("Upload template", "POST", "/templates", {
-        body: formData,
-      });
-      push(uploadResult);
-
-      if (uploadResult.status === 201) {
-        try {
-          const parsed = JSON.parse(uploadResult.bodyPreview);
-          templateId = parsed.id;
-        } catch { /* no-op */ }
-      }
-    }
+    // Get a usable template ID via a clean fetch (not from bodyPreview)
+    const templateId = await fetchTemplateId();
 
     if (!templateId) {
       push({
@@ -164,9 +135,8 @@ export default function SmokeTestPage() {
         method: "-",
         path: "-",
         status: null,
-        corsOrigin: null,
         contentType: null,
-        bodyPreview: "No template available. Upload a PDF first.",
+        bodyPreview: "No template in the store. Upload a PDF via POST /templates first.",
         pass: false,
         error: "No template ID available",
       });
@@ -225,7 +195,8 @@ export default function SmokeTestPage() {
         Backend: <code className="text-sm bg-zinc-100 dark:bg-zinc-800 px-1 rounded">{API_BASE}</code>
       </p>
       <p className="text-zinc-500 mb-6 text-sm">
-        Tests every API endpoint from the browser to verify CORS is configured correctly.
+        Each test makes a cross-origin fetch from this page. If the browser can read the response, CORS
+        is working. A CORS failure surfaces as a &quot;Failed to fetch&quot; TypeError.
       </p>
 
       <button
@@ -263,13 +234,7 @@ export default function SmokeTestPage() {
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-zinc-600 dark:text-zinc-400 ml-8">
                   <div>Status: <span className="font-mono">{r.status ?? "—"}</span></div>
                   <div>Content-Type: <span className="font-mono">{r.contentType ?? "—"}</span></div>
-                  <div>
-                    CORS Origin:{" "}
-                    <span className={`font-mono ${r.corsOrigin ? "text-green-600" : "text-red-600"}`}>
-                      {r.corsOrigin ?? "MISSING"}
-                    </span>
-                  </div>
-                  <div className="truncate">Body: <span className="font-mono">{r.bodyPreview || "—"}</span></div>
+                  <div className="col-span-2 truncate">Body: <span className="font-mono">{r.bodyPreview || "—"}</span></div>
                   {r.error && (
                     <div className="col-span-2 text-red-600 font-mono">{r.error}</div>
                   )}
