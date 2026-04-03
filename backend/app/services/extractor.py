@@ -154,7 +154,11 @@ def extract_blueprint(pdf_path: Path) -> Blueprint:
 
         if not spans:
             logger.warning("no_text_found", pdf_path=str(pdf_path))
-            return Blueprint(page_width=pw, page_height=ph)
+            return Blueprint(
+                page_width=pw,
+                page_height=ph,
+                columns=[Column(id="col_0", x0=0.0, x1=pw, y_top=ph, y_bottom=0.0)],
+            )
 
         body_spans = [s for s in spans if s.y0 > ph * _HEADER_FRACTION]
         if len(body_spans) >= 4:
@@ -849,9 +853,16 @@ def _detect_alignment(spans: list[_Span], col: Column) -> str:
 
 
 def _leading_for_spans(spans: list[_Span]) -> float:
-    """Compute typical baseline-to-baseline distance for a set of spans."""
+    """Compute typical baseline-to-baseline distance for a set of spans.
+
+    Falls back to ``size * 1.35`` when fewer than two spans exist or no
+    measurable gaps are found (avoids returning 0.0 which would cause
+    overlapping text in the generator).
+    """
+    fallback = spans[0].size * 1.35 if spans else 0.0
+
     if len(spans) < 2:
-        return 0.0
+        return fallback
 
     by_y = sorted(spans, key=lambda s: s.y0)
     gaps = [
@@ -859,7 +870,7 @@ def _leading_for_spans(spans: list[_Span]) -> float:
         for i in range(len(by_y) - 1)
         if 0 < by_y[i + 1].y0 - by_y[i].y0 < 40
     ]
-    return statistics.median(gaps) if gaps else 0.0
+    return statistics.median(gaps) if gaps else fallback
 
 
 def _unique_line_ys(spans: list[_Span], tolerance: float = 3.0) -> list[float]:

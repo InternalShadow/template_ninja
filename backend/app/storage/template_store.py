@@ -12,6 +12,14 @@ from app.models.template import TemplateMeta
 logger = structlog.stdlib.get_logger()
 
 
+class CorruptedMetadataError(Exception):
+    """Raised when templates_metadata.json exists but cannot be parsed."""
+
+    def __init__(self, path: Path, cause: Exception) -> None:
+        self.path = path
+        super().__init__(f"Corrupted metadata file at {path}: {cause}")
+
+
 class TemplateStore:
     """Filesystem-backed CRUD for templates, blueprints, and source PDFs."""
 
@@ -23,7 +31,12 @@ class TemplateStore:
     def _load_index(self) -> dict[str, TemplateMeta]:
         if not self._metadata_path.exists():
             return {}
-        raw: dict = json.loads(self._metadata_path.read_text(encoding="utf-8"))
+        text = self._metadata_path.read_text(encoding="utf-8")
+        try:
+            raw: dict = json.loads(text)
+        except json.JSONDecodeError as exc:
+            logger.error("metadata_corrupted", path=str(self._metadata_path), error=str(exc))
+            raise CorruptedMetadataError(self._metadata_path, exc) from exc
         return {k: TemplateMeta.model_validate(v) for k, v in raw.items()}
 
     def _save_index(self, index: dict[str, TemplateMeta]) -> None:
@@ -31,7 +44,9 @@ class TemplateStore:
         self._metadata_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
     def list_templates(self) -> list[TemplateMeta]:
-        return list(self._load_index().values())
+        templates = list(self._load_index().values())
+        templates.sort(key=lambda t: t.updated_at, reverse=True)
+        return templates
 
     def get_template(self, template_id: str) -> TemplateMeta:
         index = self._load_index()

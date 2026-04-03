@@ -1,3 +1,3 @@
-from app.storage.template_store import TemplateStore
+from app.storage.template_store import CorruptedMetadataError, TemplateStore
 
-__all__ = ["TemplateStore"]
+__all__ = ["CorruptedMetadataError", "TemplateStore"]

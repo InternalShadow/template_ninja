@@ -4,11 +4,13 @@ from collections.abc import AsyncIterator
 import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from starlette.requests import Request
 
 from app.api import api_router
 from app.api.deps import set_store
 from app.config import get_settings
-from app.storage import TemplateStore
+from app.storage import CorruptedMetadataError, TemplateStore
 
 logger = structlog.stdlib.get_logger()
 
@@ -44,6 +46,11 @@ app.add_middleware(
 
 
 app.include_router(api_router)
+
+
+@app.exception_handler(CorruptedMetadataError)
+async def corrupted_metadata_handler(request: Request, exc: CorruptedMetadataError) -> JSONResponse:
+    return JSONResponse(status_code=500, content={"detail": "Template metadata is corrupted. Contact the administrator."})
 
 
 @app.get("/health")

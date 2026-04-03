@@ -19,7 +19,7 @@ Store = Annotated[TemplateStore, Depends(get_store)]
 
 
 class BlueprintUpdate(BaseModel):
-    """Partial blueprint update -- only supplied fields are merged."""
+    """Partial blueprint update. Supplied top-level fields replace their existing values."""
 
     page_width: float | None = None
     page_height: float | None = None
