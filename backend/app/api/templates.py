@@ -1,9 +1,11 @@
-"""Template CRUD endpoints: upload, list, get, delete."""
+"""Template CRUD endpoints: upload, list, get, delete, image."""
 
 from typing import Annotated
 
+import fitz
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, Form
+from fastapi.responses import Response
 
 from app.api.deps import get_store, get_template_service
 from app.models.template import TemplateDetail, TemplateMeta
@@ -49,3 +51,26 @@ async def delete_template(store: Store, template_id: str) -> None:
         store.delete_template(template_id)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=exc.args[0]) from exc
+
+
+@router.get("/{template_id}/image", response_class=Response)
+async def get_template_image(store: Store, template_id: str) -> Response:
+    """Render page 0 of the source PDF as a 2x-resolution PNG."""
+    try:
+        store.get_template(template_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=exc.args[0]) from exc
+    try:
+        pdf_path = store.get_source_pdf_path(template_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    doc = fitz.open(pdf_path)
+    try:
+        page = doc[0]
+        pixmap = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+        png_bytes = pixmap.tobytes(output="png")
+    finally:
+        doc.close()
+
+    return Response(content=png_bytes, media_type="image/png")
